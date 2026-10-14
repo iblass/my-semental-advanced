@@ -1,0 +1,78 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101827">
+<title>My Semental Advanced</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;padding:20px;background:#101827;
+  color:#fff;font-family:Arial,sans-serif
+}
+header{text-align:center;margin:24px 0}
+h1{color:#65e6a5;font-size:26px}
+.panel{
+  background:#1e293b;padding:18px;
+  border-radius:16px;margin:16px 0
+}
+button{
+  width:100%;padding:14px;margin-top:14px;
+  border:0;border-radius:10px;
+  background:#65e6a5;color:#102018;
+  font-size:16px;font-weight:bold
+}
+input[type=file]{width:100%;margin:12px 0}
+#pantalla{
+  min-height:180px;background:#000;
+  border-radius:12px;display:flex;
+  justify-content:center;align-items:center;
+  text-align:center;padding:16px;color:#94a3b8
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>🐎 My Semental Advanced</h1>
+  <p>Tu consola portátil de GBA</p>
+</header>
+
+<section class="panel">
+  <h2>🎮 Biblioteca</h2>
+  <p>Seleccioná una ROM de GBA.</p>
+  <input id="rom" type="file" accept=".gba,.zip">
+  <button onclick="cargar()">Seleccionar juego</button>
+  <p id="estado">Esperando un juego...</p>
+</section>
+
+<section class="panel">
+  <h2>🕹️ Consola</h2>
+  <div id="pantalla">
+    El motor de emulación se integrará
+    en el siguiente paso.
+  </div>
+</section>
+
+<section class="panel">
+  <h2>⚙️ Personalización</h2>
+  <p>Nombre: My Semental Advanced</p>
+  <p>Plataforma: Game Boy Advance</p>
+  <p>Próximamente: partidas, trucos y controles.</p>
+</section>
+
+<script>
+function cargar(){
+  const archivo=document.getElementById("rom").files[0];
+  const estado=document.getElementById("estado");
+  if(!archivo){
+    estado.textContent="Primero elegí un archivo.";
+    return;
+  }
+  estado.textContent="Seleccionaste: "+archivo.name+
+    ". El motor GBA todavía no está conectado.";
+}
+</script>
+</body>
+</html>
