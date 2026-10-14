@@ -3,74 +3,127 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#101827">
 <title>My Semental Advanced</title>
 <style>
-*{box-sizing:border-box}
-body{
- margin:0;padding:18px;background:#101827;
- color:#fff;font-family:Arial,sans-serif
+body {
+  margin: 0;
+  padding: 16px;
+  background: #101827;
+  color: white;
+  font-family: Arial, sans-serif;
 }
-header{text-align:center;padding:14px}
-h1{color:#65e6a5;font-size:25px}
-.panel{
- background:#1e293b;border-radius:15px;
- padding:16px;margin:15px 0
+h1 {
+  color: #65e6a5;
+  text-align: center;
 }
-button{
- display:block;width:100%;padding:14px;
- margin-top:12px;border:0;border-radius:10px;
- background:#65e6a5;color:#102018;
- font-size:16px;font-weight:bold
+.panel {
+  background: #1e293b;
+  border-radius: 14px;
+  padding: 16px;
+  margin: 14px 0;
 }
-input{max-width:100%;margin:12px 0}
-#pantalla{
- background:#000;min-height:180px;
- border-radius:10px;display:flex;
- justify-content:center;align-items:center;
- text-align:center;padding:12px;color:#aab4c3
+button {
+  width: 100%;
+  padding: 14px;
+  margin: 10px 0;
+  border: 0;
+  border-radius: 10px;
+  background: #65e6a5;
+  color: #102018;
+  font-weight: bold;
+  font-size: 16px;
+}
+input { max-width: 100%; margin: 12px 0; }
+#game {
+  width: 100%;
+  min-height: 300px;
+  background: #000;
+  overflow: hidden;
+}
+#estado {
+  color: #cbd5e1;
+  overflow-wrap: anywhere;
 }
 </style>
 </head>
 <body>
-<header>
- <h1>🐎 My Semental Advanced</h1>
- <p>Tu consola portátil de Game Boy Advance</p>
-</header>
+
+<h1>🐎 My Semental Advanced</h1>
 
 <section class="panel">
- <h2>🎮 Biblioteca de juegos</h2>
- <p>Seleccioná una ROM de GBA.</p>
- <input id="rom" type="file" accept=".gba">
- <button id="iniciar">Iniciar juego</button>
- <p id="estado">Esperando un juego...</p>
+  <h2>🎮 Biblioteca GBA</h2>
+  <p>Elegí una ROM de Game Boy Advance.</p>
+  <input id="rom" type="file" accept=".gba">
+  <button id="iniciar">Iniciar juego</button>
+  <p id="estado">Emulador preparado.</p>
 </section>
 
 <section class="panel">
- <h2>🕹️ Consola</h2>
- <div id="pantalla">
-  Todavía no hay ningún juego ejecutándose.
- </div>
-</section>
-
-<section class="panel">
- <h2>⚙️ Mi emulador</h2>
- <p>Versión inicial de My Semental Advanced.</p>
- <p>Próximas funciones: guardados, trucos y controles táctiles.</p>
+  <h2>🕹️ Consola</h2>
+  <div id="game"></div>
 </section>
 
 <script>
-document.getElementById("iniciar").onclick=function(){
- const archivo=document.getElementById("rom").files[0];
- const estado=document.getElementById("estado");
- if(!archivo){
-  estado.textContent="Primero seleccioná una ROM.";
-  return;
- }
- estado.textContent="Archivo seleccionado: "+archivo.name+
- ". El motor GBA debe estar integrado para ejecutar el juego.";
-};
+const boton = document.getElementById("iniciar");
+const selector = document.getElementById("rom");
+const estado = document.getElementById("estado");
+
+let iniciado = false;
+let urlJuego = null;
+
+boton.addEventListener("click", function () {
+  if (iniciado) return;
+
+  const archivo = selector.files[0];
+
+  if (!archivo) {
+    estado.textContent = "Seleccioná primero una ROM .gba.";
+    return;
+  }
+
+  if (!archivo.name.toLowerCase().endsWith(".gba")) {
+    estado.textContent = "El archivo debe terminar en .gba.";
+    return;
+  }
+
+  iniciado = true;
+  boton.disabled = true;
+  selector.disabled = true;
+  estado.textContent = "Cargando motor GBA. Esperá...";
+
+  urlJuego = URL.createObjectURL(archivo);
+
+  // Configuración oficial de EmulatorJS
+  window.EJS_player = "#game";
+  window.EJS_core = "gba";
+  window.EJS_gameName = archivo.name.replace(/\.gba$/i, "");
+  window.EJS_gameUrl = urlJuego;
+  window.EJS_pathtodata =
+    "https://cdn.emulatorjs.org/stable/data/";
+  window.EJS_biosUrl = "";
+  window.EJS_startOnLoaded = true;
+  window.EJS_language = "es-ES";
+  window.EJS_color = "#65e6a5";
+  window.EJS_controlScheme = "gba";
+
+  const script = document.createElement("script");
+  script.src =
+    "https://cdn.emulatorjs.org/stable/data/loader.js";
+
+  script.onerror = function () {
+    estado.textContent =
+      "No se pudo descargar el motor. Revisá Internet y recargá la página.";
+    iniciado = false;
+    boton.disabled = false;
+    selector.disabled = false;
+    URL.revokeObjectURL(urlJuego);
+    urlJuego = null;
+  };
+
+  document.body.appendChild(script);
+});
 </script>
 </body>
 </html>
