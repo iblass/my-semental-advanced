@@ -3,76 +3,92 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport"
+ content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#101827">
 <title>My Semental Advanced</title>
 <style>
-*{box-sizing:border-box}
 body{
-  margin:0;padding:20px;background:#101827;
-  color:#fff;font-family:Arial,sans-serif
+ margin:0;padding:16px;background:#101827;
+ color:white;font-family:Arial,sans-serif
 }
-header{text-align:center;margin:24px 0}
-h1{color:#65e6a5;font-size:26px}
+h1{color:#65e6a5;text-align:center}
 .panel{
-  background:#1e293b;padding:18px;
-  border-radius:16px;margin:16px 0
+ background:#1e293b;padding:16px;
+ margin:14px 0;border-radius:14px
 }
 button{
-  width:100%;padding:14px;margin-top:14px;
-  border:0;border-radius:10px;
-  background:#65e6a5;color:#102018;
-  font-size:16px;font-weight:bold
+ padding:13px;width:100%;margin-top:12px;
+ background:#65e6a5;color:#102018;
+ font-weight:bold;border:0;border-radius:9px
 }
-input[type=file]{width:100%;margin:12px 0}
-#pantalla{
-  min-height:180px;background:#000;
-  border-radius:12px;display:flex;
-  justify-content:center;align-items:center;
-  text-align:center;padding:16px;color:#94a3b8
-}
+input{max-width:100%;margin:12px 0}
+#game{width:100%;min-height:300px}
+#estado{color:#cbd5e1}
 </style>
 </head>
 <body>
-<header>
-  <h1>🐎 My Semental Advanced</h1>
-  <p>Tu consola portátil de GBA</p>
-</header>
+<h1>🐎 My Semental Advanced</h1>
 
 <section class="panel">
-  <h2>🎮 Biblioteca</h2>
-  <p>Seleccioná una ROM de GBA.</p>
-  <input id="rom" type="file" accept=".gba,.zip">
-  <button onclick="cargar()">Seleccionar juego</button>
-  <p id="estado">Esperando un juego...</p>
+ <h2>🎮 Elegí tu juego</h2>
+ <p>Seleccioná una ROM .gba que tengas legalmente.</p>
+ <input id="rom" type="file" accept=".gba">
+ <button id="iniciar">Iniciar juego</button>
+ <p id="estado">Emulador preparado.</p>
 </section>
 
 <section class="panel">
-  <h2>🕹️ Consola</h2>
-  <div id="pantalla">
-    El motor de emulación se integrará
-    en el siguiente paso.
-  </div>
-</section>
-
-<section class="panel">
-  <h2>⚙️ Personalización</h2>
-  <p>Nombre: My Semental Advanced</p>
-  <p>Plataforma: Game Boy Advance</p>
-  <p>Próximamente: partidas, trucos y controles.</p>
+ <h2>🕹️ Consola GBA</h2>
+ <div id="game"></div>
 </section>
 
 <script>
-function cargar(){
-  const archivo=document.getElementById("rom").files[0];
-  const estado=document.getElementById("estado");
-  if(!archivo){
-    estado.textContent="Primero elegí un archivo.";
-    return;
-  }
-  estado.textContent="Seleccionaste: "+archivo.name+
-    ". El motor GBA todavía no está conectado.";
-}
+document.getElementById("iniciar")
+.addEventListener("click", function () {
+ const archivo = document.getElementById("rom").files[0];
+ const estado = document.getElementById("estado");
+
+ if (!archivo) {
+   estado.textContent = "Primero elegí una ROM .gba.";
+   return;
+ }
+
+ if (!archivo.name.toLowerCase().endsWith(".gba")) {
+   estado.textContent = "Seleccioná un archivo .gba.";
+   return;
+ }
+
+ estado.textContent = "Cargando motor GBA...";
+
+ // Configuración de EmulatorJS
+ window.EJS_player = "#game";
+ window.EJS_core = "gba";
+ window.EJS_gameName = archivo.name.replace(/\.gba$/i, "");
+ window.EJS_gameUrl = URL.createObjectURL(archivo);
+ window.EJS_pathtodata =
+   "https://cdn.emulatorjs.org/stable/data/";
+ window.EJS_biosUrl = "";
+ window.EJS_startOnLoaded = true;
+
+ const script = document.createElement("script");
+ script.src =
+   "https://cdn.emulatorjs.org/stable/data/loader.js";
+ script.onload = function () {
+   estado.textContent =
+     "Motor cargado. Esperá a que se inicie el juego.";
+ };
+ script.onerror = function () {
+   estado.textContent =
+     "No se pudo cargar el motor. Revisá tu conexión.";
+ };
+ document.getElementById("game").innerHTML = "";
+ document.getElementById("game").appendChild(
+   document.createElement("div")
+ );
+ document.body.appendChild(script);
+ document.getElementById("iniciar").disabled = true;
+});
 </script>
 </body>
 </html>
